@@ -24,6 +24,9 @@ jobs:
         run: mvn clean verify
         working-directory: simple-api
 
+      - name: Analyse with SonarCloud
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=pierre-ingrachen -Dsonar.organization=pierre-ingrachen -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api/pom.xml
+
   # define job to build and publish docker image
   build-and-push-docker-image:
     needs: test-backend
