@@ -25,7 +25,7 @@ jobs:
         working-directory: simple-api
 
       - name: Analyse with SonarCloud
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=pierre-ingrachen -Dsonar.organization=pierre-ingrachen -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api/pom.xml
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=pierre-ingrachen_devops-epf-tp2-Dsonar.organization=pierre-ingrachen -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}  --file ./simple-api/pom.xml
 
   # define job to build and publish docker image
   build-and-push-docker-image:
