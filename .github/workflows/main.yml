@@ -66,3 +66,33 @@ jobs:
           context: ./http-server
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
+
+  # deploy the freshly pushed images on the remote server with Ansible
+  deploy:
+    needs: build-and-push-docker-image
+    # only deploy from main, the only branch that pushes images
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Write SSH private key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy with Ansible
+        working-directory: ansible
+        run: >
+          ansible-playbook -i inventories/setup.yml playbook.yml
+          -e ansible_ssh_private_key_file=~/.ssh/id_rsa
+          -e dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Check the API answers
+        run: curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/departments/IRC/students"
