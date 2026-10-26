@@ -104,4 +104,5 @@ jobs:
       - name: Check the API and the front answer
         run: |
           curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/api/departments/IRC/students"
-          curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/" | grep -qi "<div id=\"app\">"
+          curl --fail --retry 10 --retry-delay 5 --retry-all-errors -o front.html "http://${{ secrets.SSH_HOST }}/"
+          grep -q "id=.\?app" front.html
