@@ -67,6 +67,13 @@ jobs:
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
+      - name: Build image and push front
+        uses: docker/build-push-action@v6
+        with:
+          context: ./front
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
   # deploy the freshly pushed images on the remote server with Ansible
   deploy:
     needs: build-and-push-docker-image
@@ -94,5 +101,7 @@ jobs:
           -e ansible_ssh_private_key_file=~/.ssh/id_rsa
           -e dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}
 
-      - name: Check the API answers
-        run: curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/departments/IRC/students"
+      - name: Check the API and the front answer
+        run: |
+          curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/api/departments/IRC/students"
+          curl --fail --retry 10 --retry-delay 5 --retry-all-errors "http://${{ secrets.SSH_HOST }}/" | grep -qi "<div id=\"app\">"

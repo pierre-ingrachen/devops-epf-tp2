@@ -11,5 +11,7 @@
       tags: database
     - role: launch_app
       tags: app
+    - role: launch_front
+      tags: front
     - role: launch_proxy
       tags: proxy
